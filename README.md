@@ -1,0 +1,129 @@
+# Contributors
+
+- Valentin Sheboldaev
+
+
+# Loader-Generic Application Description
+
+LOADER
+- loads data to Oracle database
+- has oracle-instantclient conda package installed in the environment
+- loads data with sqlldr binary. Download package from here: (https://anaconda.org/kadrlica/oracle-instantclient/files)
+- after installation main folder for Orahome is /loader_generic/venv/orahome
+- loader works with .csv files from the DATA folder. Provides logs in the LOG folder.
+
+# Project path's
+
+All project paths are described in the loader.py in Config class.
+
+
+The base path is the path provided in the main command (to run the script, in the load_uat.sh) in the part where the config file path is (after -c).
+
+Your current project directory path is based on that path. BASE_PATH=<First Part without /etc/ part>.
+
+All other project folders are based on the BASE_PATH.
+
+If you mess something with the passes - look to the loader.py to check your structure.
+
+    $ /ndml-sonus/loader_generic/venv/bin/python /ndml-sonus/loader_generic/bin/loader.py -c /ndml-sonus/loader_generic/etc/test_loader.conf >> /ndml-sonus/loader_generic/log/loader.out 2>&1
+
+
+## Installation and configuration
+
+In order to successfully install loader-generic application you need to proceed next steps:
+
+To update loader-generic python package clone it on your laptop:
+
+    $ git clone https://github.com/w-e-ll/loader-generic.git
+    $ cd loader-generic (work with it and commit updates to the repository)
+
+To install loader-generic application download source code as zip or tar.gz archive to your server:
+
+    # https://github.com/w-e-ll/loader-generic.git -> download repository link
+    $ unzip loader-generic.zip archive
+    $ cd loader-generic
+    # - Chech Project Structure section to understand the application structure
+    # - We only need to copy/move files from next folders: scripts_shell, etc, oracle
+    # - We do not use files from the loader_generic package folder
+    # - Delete all non needed files (that are for the python package repository)
+
+Make folder for loader-generic python package:
+
+    $ mkdir loader_generic
+    $ cd loader_generic
+
+Create conda environment: install right version of python:
+    
+    $ conda install python==3.10.4
+    $ conda create -p ./venv python=3.10.4
+    $ conda activate /loader_generic/venv
+    $ python -m pip install --upgrade pip
+    $ pip install loader-generic
+    # update project folder structure appropriately like in the Project Structure is explained (dell all you don't need)
+
+Now we have such files (unzipped downloaded archive folder), so let's copy or move files where they should be:
+
+    # our dowloaded unzipped archive folder
+    # /loader_generic /etc /oracle /scripts_shell .gitignore CHANGELOG.md MANIFEST.in README.md requirements.txt setup.py    
+    # copy from these folders to beyond Project Structure folders like it is described
+
+We need to create the same project structure for downloaded python package.
+
+    $ mkdir (bin, data, etc, log, raw, var)
+
+You need to copy files from what we have (downloaded archive) to what we need (project structure).
+
+To copy sh, config files, /oracle with all files/folders:
+
+    $ cp -r </folder/file> </folder>
+
+We have to make such project folders structure + files that we already have from downloaded archive:
+
+## Project Structure
+
+    #  /loader_generic
+    #      /bin
+    #          copy_and_load_prod.sh
+    #          loader.py -> ../venv/bin/loader.py
+    #          load_production.sh
+    #          load_uat.sh
+    #      /data
+    #      /etc
+    #          loader_generic.bbbo01u.conf
+    #      /log
+    #          /sqlldr
+    #      /var
+    #      /venv
+    #      /oracle
+    #          ldap.ora
+    #          sqlnet.ora
+    #          oracle_env.sh
+    #          /rdbms
+    #               /mesg
+    #                   ulus.msb
+    #                   ulus.msg
+
+You need to copy files from what we have to what we need.
+
+To copy sh, config files, /oracle with all files/folders:
+
+    $ cp -r </folder/file> </folder>
+
+We need to make symlinks from mapping:
+
+    # <project-folder>/<python-package-folder>/venv/bin/file : <project-folder>/<python-package-folder>/bin
+
+To create symlinks as an example:
+
+    $ ln -s /loader_generic/venv/bin/loader.py /loader_generic/bin
+    # we need to make all the symlinks provided in Project Structure!
+
+Then you need to update path's in every .sh file since they run the main application. Current paths are for example.
+
+All the files that are not in the Project Structure, but you still have them in the downloaded archive, could be deleted.
+
+To run the loader you should use the next command. Change path to yours:
+
+LOADER:
+
+    $ /loader_generic/venv/bin/python /loader_generic/bin/loader.py -c /loader_generic/etc/loader_generic.bbbo01u.conf >> /loader_generic/log/loader_generic.stdout 2> /loader_generic/log/loader_generic.stderr
